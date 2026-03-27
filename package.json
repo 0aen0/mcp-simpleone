@@ -1,0 +1,50 @@
+{
+  "name": "mcp-simpleone",
+  "version": "1.0.0",
+  "description": "MCP-сервер для интеграции с SimpleOne (ESM) через REST API",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "mcp-simpleone": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "dev:stdio": "tsx src/index.ts",
+    "dev:http": "tsx src/index.ts --transport http",
+    "dev:sse": "tsx src/index.ts --transport sse",
+    "build": "tsc",
+    "build:standalone": "tsx scripts/build-standalone.ts",
+    "start": "node dist/index.js",
+    "start:http": "node dist/index.js --transport http",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src --ignore-pattern '**/*.test.ts'"
+  },
+  "keywords": [
+    "mcp",
+    "simpleone",
+    "esm",
+    "integration"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.0",
+    "express": "^4.18.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.0",
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.55.0",
+    "tsx": "^4.6.0",
+    "typescript": "^5.3.0",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^3.2.4"
+  }
+}
