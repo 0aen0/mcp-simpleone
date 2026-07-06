@@ -49,6 +49,11 @@ SIMPLEONE_BASIC_PASSWORD=your-password
 NODE_TLS_REJECT_UNAUTHORIZED=0
 ```
 
+Вместо Basic Auth можно задать `SIMPLEONE_API_KEY` — токен SimpleOne
+(`auth_key` из `POST /rest/v1/auth/login`), сервер отправит его заголовком
+`Authorization: Bearer`. При заданных обоих вариантах приоритет у токена.
+Оба способа авторизации описаны в [документации Table API](https://docs.simpleone.ru/platform/developer/integration/rest-api/table-api).
+
 ### Шаг 4: Запуск
 
 **Проверка работы:**
@@ -65,6 +70,71 @@ npm start
 ```bash
 npm run start:sse
 ```
+
+## 🐳 Развёртывание в Docker
+
+Альтернатива автономному пакету — контейнер. В репозитории есть `Dockerfile`
+(двухэтапная сборка) и шаблон `docker-compose.yml.example`.
+
+### Как устроена сборка (Dockerfile)
+
+Сборка идёт в два этапа от образа `node:20-slim`:
+
+| Этап | Что делает |
+|---|---|
+| **builder** | `npm ci` со всеми зависимостями (dev нужны для `tsc`), копирует `src/` и собирает TypeScript в `dist/` |
+| **runtime** | `NODE_ENV=production`, ставит только prod-зависимости (`npm ci --omit=dev`), забирает готовый `dist/` из builder |
+
+Итоговый образ не содержит исходников, dev-зависимостей и компилятора.
+Особенности runtime-этапа:
+
+- `package.json` копируется в образ — он читается в рантайме из `dist/config.js` (версия сервера);
+- процесс работает от непривилегированного пользователя `node`;
+- каталог `/app/logs` создан заранее (для `LOG_OUTPUT=file|both`);
+- `HEALTHCHECK` опрашивает `GET /health` каждые 30 с;
+- `CMD` по умолчанию запускает HTTP/SSE транспорт на порту 3000; для stdio-режима переопределите команду: `["node","dist/index.js"]`.
+
+**Аргументы сборки:**
+
+| ARG | По умолчанию | Назначение |
+|---|---|---|
+| `REGISTRY` | пусто (Docker Hub) | Хост кеширующего зеркала реестра, **со слешем на конце** |
+| `NODE_TAG` | `20-slim` | Тег базового образа Node.js |
+
+```bash
+# Обычная сборка
+docker build -t mcp-simpleone .
+
+# Через зеркало реестра
+docker build --build-arg REGISTRY=your-mirror.example.com/ -t mcp-simpleone .
+
+# Запуск (конфигурация — из .env, см. .env.example)
+docker run -d --name mcp-simpleone --env-file .env -p 3000:3000 mcp-simpleone
+```
+
+### Docker Compose
+
+```bash
+cp docker-compose.yml.example docker-compose.yml
+cp .env.example .env   # и заполните аутентификацию
+docker compose up -d --build
+
+# Проверка
+docker compose ps                      # healthcheck: healthy
+curl http://localhost:3000/health
+```
+
+Переменные окружения compose-файла (задаются в shell или в `.env`):
+
+| Переменная | По умолчанию | Назначение |
+|---|---|---|
+| `REGISTRY` | пусто | Зеркало реестра для сборки (со слешем) |
+| `NODE_TAG` | `20-slim` | Тег базового образа |
+| `HOST_PORT` | `3000` | Порт, публикуемый на хосте (внутри контейнера всегда 3000) |
+
+Настройки SimpleOne (URL, `SIMPLEONE_API_KEY` или Basic Auth) контейнер
+получает из `.env` через `env_file`. Каталог `./logs` монтируется в
+`/app/logs` — файловые логи переживают пересоздание контейнера.
 
 ## 🔧 Подключение к Qwen Code
 

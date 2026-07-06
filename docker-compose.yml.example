@@ -1,0 +1,39 @@
+services:
+  mcp-simpleone:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Хост кеширующего реестра-зеркала. Пусто = Docker Hub напрямую.
+        # Задаётся через переменную окружения REGISTRY (со слешем на конце), напр.:
+        #   REGISTRY=your-mirror.example.com/ docker compose build
+        REGISTRY: ${REGISTRY:-}
+        NODE_TAG: ${NODE_TAG:-20-slim}
+    image: mcp-simpleone:latest
+    container_name: mcp-simpleone
+    restart: unless-stopped
+
+    # Настройки SimpleOne и аутентификация берутся из .env
+    # (скопируйте .env.example -> .env и заполните).
+    env_file:
+      - .env
+
+    # Контейнер всегда слушает 3000 внутри (см. CMD в Dockerfile).
+    # Публикуемый на хосте порт можно сменить через HOST_PORT.
+    ports:
+      - "${HOST_PORT:-3000}:3000"
+
+    # Файловые логи при LOG_OUTPUT=file|both (по умолчанию пишет в stdout)
+    volumes:
+      - ./logs:/app/logs
+
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3

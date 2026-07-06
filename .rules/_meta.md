@@ -1,7 +1,7 @@
 # Meta
 
 ## Version
-**v1.10** — 2026-03-27 (обновление документации)
+**v1.11** — 2026-07-06 (Bearer-аутентификация, Docker-документация)
 **Generator:** DEMIURGOS v22.3
 **Sizing:** Знания=[M] × Инструменты=[1] × Расширения=[0]
 **Context Budget:** модель 128K → бюджет ≤ 38K → текущий ~10K
@@ -28,6 +28,10 @@
 ## Журнал изменений
 | Дата | Что | Почему |
 |---|---|---|
+| 2026-07-06 | Ссылки на официальную документацию Table API в README/MCP_SETUP/DEPLOYMENT/AGENTS | docs.simpleone.ru подтверждает Basic/Bearer; добавлена таблица маппинга параметров на `sysparm_*` |
+| 2026-07-06 | `SIMPLEONE_API_KEY` шлётся как `Authorization: Bearer` (auth.ts) | Инстанс SimpleOne отвергает `X-API-Key` с 401; токен = auth_key из POST /rest/v1/auth/login |
+| 2026-07-06 | Обновлены README, MCP_SETUP, DEPLOYMENT, .env.example | Документирование Bearer-аутентификации и получения токена |
+| 2026-07-06 | Docker-документация: сборка Dockerfile + docker-compose.yml.example | Раздел в DEPLOYMENT.md и README; в шаблоне compose включён build-arg `REGISTRY: ${REGISTRY:-}` |
 | 2026-03-27 | Обновлена документация проекта | Актуализация README, AGENTS, QWEN, MCP_SETUP, GITHUB_DEPLOYMENT |
 | 2026-03-27 | Удалена standalone директория | Генерируется через npm run build:standalone |
 | 2026-03-27 | Добавлена переменная `version` из package.json | Версия программы доступна в config, health, info endpoints |

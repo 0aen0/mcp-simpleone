@@ -1,0 +1,32 @@
+# Зависимости и сборка ставятся внутри образа
+node_modules
+dist
+standalone
+coverage
+
+# Логи
+logs
+*.log
+
+# Секреты — НЕ попадают в образ (передаются через env_file)
+.env
+.env.local
+.env.*.local
+
+# Git / IDE / ОС
+.git
+.gitignore
+.gitattributes
+.vscode
+.idea
+*.swp
+.DS_Store
+Thumbs.db
+
+# Прочее, ненужное для сборки
+.rules
+.qwen
+*.md
+Dockerfile
+docker-compose.yml
+.dockerignore

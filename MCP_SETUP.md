@@ -160,7 +160,7 @@ curl -N http://localhost:3000/sse
 | Переменная | Описание | Пример |
 |---|---|---|
 | `SIMPLEONE_URL` | URL SimpleOne (ESM) | `https://your-instance.simpleone.ru` |
-| `SIMPLEONE_API_KEY` | API-ключ (вариант 1) | `your-api-key` |
+| `SIMPLEONE_API_KEY` | Токен SimpleOne — `auth_key` из `POST /rest/v1/auth/login`, отправляется как `Authorization: Bearer` (вариант 1, приоритетнее Basic Auth) | `your-auth-token` |
 | `SIMPLEONE_BASIC_USER` | Пользователь Basic Auth (вариант 2) | `your-username` |
 | `SIMPLEONE_BASIC_PASSWORD` | Пароль Basic Auth (вариант 2) | `your-password` |
 | `SIMPLEONE_TIMEOUT` | Таймаут запросов (мс) | `30000` |
@@ -171,15 +171,18 @@ curl -N http://localhost:3000/sse
 | `LOG_OUTPUTL` | Вывод логов | `stdout` |
 | `LOG_FILE` | Путь к файлу логов (используется при LOG_OUTPUT=file или both) | `./logs/mcp-simpleone.log` |
 
+Способы авторизации (Basic Auth / Bearer Token) и параметры запросов описаны в
+[официальной документации Table API](https://docs.simpleone.ru/platform/developer/integration/rest-api/table-api).
+
 **Пример `.env`:**
 ```bash
 # SimpleOne (ESM) URL
 SIMPLEONE_URL=https://your-instance.simpleone.ru
 
-# Аутентификация (выберите один вариант)
+# Аутентификация (выберите один вариант; при обоих приоритет у API-ключа)
 
-# Вариант 1: API-ключ
-#SIMPLEONE_API_KEY=your-api-key-here
+# Вариант 1: токен (auth_key из POST /rest/v1/auth/login, шлётся как Bearer)
+#SIMPLEONE_API_KEY=your-auth-token-here
 
 # Вариант 2: Basic Auth
 SIMPLEONE_BASIC_USER=your-username
