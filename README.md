@@ -23,8 +23,24 @@ cp .env.example .env
 2. Заполните конфигурацию:
 ```env
 SIMPLEONE_URL=https://your-instance.simpleone.ru
-SIMPLEONE_API_KEY=your-api-key-here
+SIMPLEONE_API_KEY=your-auth-token-here
 ```
+
+`SIMPLEONE_API_KEY` — это токен SimpleOne (`auth_key`), передаётся в запросах
+заголовком `Authorization: Bearer <токен>` (заголовок `X-API-Key` инстанс
+SimpleOne не принимает). Получить токен можно через штатный эндпоинт:
+```bash
+curl -X POST "$SIMPLEONE_URL/rest/v1/auth/login" \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"...","password":"..."}'
+# → {"status":"OK","data":{"auth_key":"..."}}
+```
+Токен сессионный и со временем истекает — при 401 получите новый.
+
+Оба способа авторизации Table API — Basic Auth и Bearer Token — описаны в
+[официальной документации SimpleOne](https://docs.simpleone.ru/platform/developer/integration/rest-api/table-api)
+(раздел Authorization). Эндпоинт получения токена `/rest/v1/auth/login` в
+публичной документации не описан, но штатно работает (проверено на инстансе).
 
 Или используйте Basic Auth:
 ```env
@@ -32,6 +48,8 @@ SIMPLEONE_URL=https://your-instance.simpleone.ru
 SIMPLEONE_BASIC_USER=your-username
 SIMPLEONE_BASIC_PASSWORD=your-password
 ```
+
+Если заданы оба варианта, приоритет у `SIMPLEONE_API_KEY`.
 
 ## Запуск
 
@@ -52,6 +70,19 @@ npm run build
 npm start           # stdio режим
 npm run start:http  # SSE режим на порту 3000
 ```
+
+### Docker
+```bash
+cp docker-compose.yml.example docker-compose.yml
+cp .env.example .env   # заполните аутентификацию
+docker compose up -d --build
+curl http://localhost:3000/health
+```
+
+Образ собирается двухэтапно (builder → runtime, `node:20-slim`), в рантайме —
+только prod-зависимости и `dist/`, процесс от пользователя `node`, встроенный
+healthcheck по `/health`. Подробности и сборка через зеркало реестра — в
+[DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Сетевой доступ (SSE)
 
@@ -231,6 +262,20 @@ NODE_TLS_REJECT_UNAUTHORIZED=0
 https://your-instance.simpleone.ru/rest/v1/table/{tableName}
 https://your-instance.simpleone.ru/rest/v1/table/{tableName}/{sys_id}
 ```
+
+Эндпоинты и параметры соответствуют [официальной документации Table API](https://docs.simpleone.ru/platform/developer/integration/rest-api/table-api).
+Параметры инструментов сервера маппятся на официальные `sysparm_*`:
+
+| Параметр инструмента | Параметр Table API |
+|---|---|
+| `query` | `sysparm_query` |
+| `limit` | `sysparm_limit` (по умолчанию 20) |
+| `page` | `sysparm_page` |
+| `fields` | `sysparm_fields` (поддерживает dot-walking) |
+| `display_value` | `sysparm_display_value` |
+| `exclude_reference_link` | `sysparm_exclude_reference_link` |
+| `view` | `sysparm_view` |
+| `no_count` | `sysparm_no_count` |
 
 ### Поддерживаемые операторы query
 

@@ -38,7 +38,7 @@ describe('SimpleOneClient', () => {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'X-API-Key': mockConfig.apiKey
+        'Authorization': `Bearer ${mockConfig.apiKey}`
       },
       httpsAgent: expect.anything()
     });

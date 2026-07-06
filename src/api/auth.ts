@@ -10,8 +10,10 @@ export interface AuthConfig {
  */
 export function buildAuthHeaders(config: AuthConfig): Record<string, string> {
   if (config.apiKey) {
+    // SimpleOne принимает токен (auth_key из /rest/v1/auth/login) только как Bearer;
+    // заголовок X-API-Key инстанс отвергает с 401.
     return {
-      'X-API-Key': config.apiKey
+      'Authorization': `Bearer ${config.apiKey}`
     };
   }
   

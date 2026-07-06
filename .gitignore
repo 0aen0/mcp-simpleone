@@ -29,10 +29,12 @@ coverage/
 # Temporary files
 tmp/
 temp/
+logs/
 
 # User-specific files
 user-table-structure.json
 *.md_1
+docker-compose.yml
 
 # Qwen Code
 .qwen/

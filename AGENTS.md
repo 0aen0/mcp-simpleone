@@ -29,6 +29,7 @@ MCP-сервер для интеграции с SimpleOne (ESM) через REST 
 - Поддерживаемые операторы: `=`, `!=`, `>`, `<`, `>=`, `<=`, `LIKE`, `IN`, `ISEMPTY`, `ISNOTEMPTY`, `CHANGESTO`, `CHANGES`, `^` (AND), `^OR` (OR), `DYNAMIC`
 - Dot-walking: поддерживается в query и fields (например: `assigned_user.department=IT`)
 - no_count: отключение подсчёта записей для оптимизации
+- Параметры маппятся на официальные `sysparm_*` Table API: [документация SimpleOne](https://docs.simpleone.ru/platform/developer/integration/rest-api/table-api)
 
 **HTTP методы:**
 - GET (READ), POST (CREATE), PATCH (частичное UPDATE), PUT (полное UPDATE), DELETE
